@@ -1,5 +1,12 @@
 ---
-description: "Archive a completed change in the experimental workflow"
+name: openspec-archive-change
+description: Archive a completed OpenSpec change in the experimental workflow. Use when the user wants to finalize and archive a change after implementation is complete. Also use when the user says "openspec archive" or "opsx archive".
+allowed-tools: Bash(openspec:*)
+license: MIT
+compatibility: Requires openspec CLI.
+metadata:
+  author: openspec
+  version: "1.0"
 ---
 
 Archive a completed change in the experimental workflow.
@@ -12,23 +19,14 @@ One `"root": null` is not about setup: when a `status` error message starts with
 
 Otherwise, with no root, what happens next depends on how this workflow was reached:
 
-- **Auto-selected**: you chose this workflow yourself, without the user naming OpenSpec, naming this skill, or running its slash command. Stop using OpenSpec and answer the request normally, as you would with no OpenSpec installed. Do not ask them to set anything up and do not mention OpenSpec setup.
-- **Explicit OpenSpec request**: the user named OpenSpec, named this skill, or ran its slash command. Stop before writing and ask how to proceed: set this project up (`openspec init`), target a store they already have (`--store <id>`), or continue without OpenSpec for this request. Wait for their answer.
+- **Auto-selected**: you chose this workflow yourself, without the user naming OpenSpec, naming this skill, or invoking this skill by name. Stop using OpenSpec and answer the request normally, as you would with no OpenSpec installed. Do not ask them to set anything up and do not mention OpenSpec setup.
+- **Explicit OpenSpec request**: the user named OpenSpec, named this skill, or invoked this skill by name. Stop before writing and ask how to proceed: set this project up (`openspec init`), target a store they already have (`--store <id>`), or continue without OpenSpec for this request. Wait for their answer.
 
 In both branches, never create the root as a side effect: do not run `openspec init` until the user asks for it, do not hand-create `openspec/` files, and do not let a command create it.
 
 `<capability-path>` is the spec directory relative to `specs/` (for example, `user-auth` or `identity/user-auth`). Preserve the full path from each delta spec when resolving its main spec.
 
-**Input**: Optionally specify a change name after `/opsx-archive` (e.g., `/opsx-archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
-
-**Apply completion mode**: An explicit handoff from the Apply workflow may arrive while
-tracked archive or commit tasks remain unchecked. Do not ask for confirmation or
-stop solely because task counts are incomplete; report the count in the archive summary.
-Still stop and report if artifacts are incomplete; sync delta specs automatically when needed.
-Archive only after sync and verification succeed.
-If there are no delta specs or they are already synced, archive without another
-sync. A sync blocker or failure stops the workflow before archiving.
-Direct archive invocations retain the prompts below.
+**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
 
@@ -42,7 +40,7 @@ Direct archive invocations retain the prompts below.
    When prompting, show only active changes (not already archived).
    Include the schema used for each change if available.
 
-   Always announce: "Using change: <name>" and how to override (e.g., `/opsx-archive <other>`).
+   Always announce: "Using change: <name>" and how to override (e.g., `openspec-archive-change <other>`).
 
    **Load current archive inputs before the existing archive checks:**
 
@@ -82,7 +80,7 @@ Direct archive invocations retain the prompts below.
 
    **If any artifacts are neither `done` nor `skipped`** (skipped artifacts satisfy the requirement - the change declares skip_specs):
    - Display warning listing incomplete artifacts
-   - Prompt user for confirmation to continue
+   - Ask the user to confirm they want to proceed
    - Proceed if user confirms
 
 3. **Check task completion status**
@@ -103,14 +101,17 @@ Direct archive invocations retain the prompts below.
    other markers, including unfamiliar ones, remain incomplete.
 
    **If incomplete tasks found:**
-   - In Apply completion mode, do not stop or prompt solely because tasks remain unchecked; report the incomplete task count in the archive summary
-   - Otherwise, display a warning showing the count of incomplete tasks
-   - Prompt the user for confirmation to continue
-   - Proceed if the user confirms
+   - Display warning showing count of incomplete tasks
+   - Ask the user to confirm they want to proceed
+   - Proceed if user confirms
 
    **If `totalTasks` is zero:** Proceed without a task-related warning.
 
 4. **Assess delta spec sync state**
+
+   **Check the archive target first:** Record the target name as `<target-name>`: use the change name as-is when it already starts with a `YYYY-MM-DD-` prefix; otherwise prepend the current date as `YYYY-MM-DD-<change-name>`. Never stack a second date (same rule as `openspec archive`).
+
+   If `<planningHome.changesDir>/archive/<target-name>` already exists, stop before writing any main spec. Report the collision, name any main specs this run already synced, leave `changeRoot` where it is, and suggest renaming the existing archive or this change.
 
    Use `artifactPaths.specs.existingOutputPaths` from status JSON as the only
    delta-spec source. If the `specs` entry is missing or
@@ -138,6 +139,8 @@ Direct archive invocations retain the prompts below.
    - "Sync now" or "Sync anyway" — sync, then verify (below). Do not start any sync while a capability is sync-blocked; explain the blocker and repeat the available choices.
    - Anything else — ask again rather than archiving
 
+   Check the archive target again now. If `<planningHome.changesDir>/archive/<target-name>` exists, stop before writing any main spec, leave `changeRoot` where it is, and suggest renaming the existing archive or this change.
+
    Before a selected sync writes any main spec, run
    `openspec instructions specs --change "<name>" --json` once with the same
    selected-root flags. Require a zero exit status and valid artifact-instruction
@@ -147,7 +150,7 @@ Direct archive invocations retain the prompts below.
    form of main specs produced by this merge; do not use them as archive guidance,
    change CLI behavior, or copy the rule text into any output file.
 
-   Then run the `/opsx-sync` workflow inline (agent-driven intelligent merge) for change '<name>', passing the delta spec analysis and the fetched specs-rule snapshot from above, and wait for it to finish. The inline sync must reuse that snapshot without fetching `specs` instructions again. Do not delegate it to a background task — step 5 would move `changeRoot` out from under a sync that is still reading it, leaving the change archived and the main specs never updated. If your agent can only run it by delegation, delegate synchronously and wait for the result.
+   Then run the `openspec-sync-specs` workflow inline if that skill is installed, or otherwise perform the delta-to-main-spec merge inline yourself (an agent-driven intelligent merge either way) for change '<name>', passing the delta spec analysis and the fetched specs-rule snapshot from above, and wait for it to finish. The inline sync must reuse that snapshot without fetching `specs` instructions again. Do not delegate it to a background task — step 5 would move `changeRoot` out from under a sync that is still reading it, leaving the change archived and the main specs never updated. If your agent can only run it by delegation, delegate synchronously and wait for the result.
 
    If the sync reports any stop or blocking condition, treat the sync as failed.
    Stop the archive immediately. Do not perform the post-sync content comparison and do not move its `changeRoot`.
@@ -170,20 +173,16 @@ Direct archive invocations retain the prompts below.
 
 5. **Perform the archive**
 
-   **Capture to the wiki first.** Before moving anything, run the **Capture procedure** below inline for this conversation, so new project knowledge reaches `openspec/wiki/` while the change is still in place. This is part of every archive, whether or not the user ran capture earlier. If nothing new was discussed, or it was already captured, write nothing and do not mention it. If capture stops (for example Git LFS is not installed) or fails, report that in the summary and continue archiving: capture never blocks an archive. Run it as part of this workflow; do not delegate it to a background task.
-
-   Then archive:
-
    Create an `archive` directory under `planningHome.changesDir` if it doesn't exist:
    ```bash
    mkdir -p "<planningHome.changesDir>/archive"
    ```
 
-   Generate the target name: use the change name as-is when it already starts with a `YYYY-MM-DD-` prefix; otherwise prepend the current date as `YYYY-MM-DD-<change-name>`. Never stack a second date (same rule as `openspec archive`).
+   Use the `<target-name>` recorded in step 4, unchanged.
 
-   **Check if target already exists:**
-   - If yes: Fail with error, suggest renaming existing archive or using different date
-   - If no: Move `changeRoot` to the archive directory
+   **Check again immediately before the move:**
+   - If the target now exists: Fail with error, leave `changeRoot` where it is, report any main specs step 4 synced, and suggest renaming the existing archive or this change
+   - If not: Move `changeRoot` to the archive directory
 
    ```bash
    mv "<changeRoot>" "<planningHome.changesDir>/archive/<target-name>"
@@ -195,7 +194,7 @@ Direct archive invocations retain the prompts below.
    - Change name
    - Schema that was used
    - Archive location
-   - Spec sync status (synced / sync skipped / no delta specs)
+   - Whether specs were synced (if applicable)
    - Note about any warnings (incomplete artifacts/tasks)
 
 **Output On Success**
@@ -206,96 +205,19 @@ Direct archive invocations retain the prompts below.
 **Change:** <change-name>
 **Schema:** <schema-name>
 **Archived to:** the archive path derived from `planningHome.changesDir`/<target-name>/
-**Specs:** ✓ Synced to main specs
+**Specs:** <"✓ Synced to main specs" only if the step 4 verification passed; otherwise "No delta specs" or "Sync skipped">
 
-All artifacts complete. All tasks complete.
+<"All artifacts complete. All tasks complete." — or, if archived with warnings, list them instead (e.g. "Archived with 2 incomplete tasks")>
 ```
-
-**Output On Success (No Delta Specs)**
-
-```markdown
-## Archive Complete
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** the archive path derived from `planningHome.changesDir`/<target-name>/
-**Specs:** No delta specs
-
-All artifacts complete. All tasks complete.
-```
-
-**Output On Success With Warnings**
-
-```markdown
-## Archive Complete (with warnings)
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** the archive path derived from `planningHome.changesDir`/<target-name>/
-**Specs:** Sync skipped (user chose to skip)
-
-**Warnings:**
-- Archived with 2 incomplete artifacts
-- Archived with 3 incomplete tasks
-- Delta spec sync was skipped (user chose to skip)
-
-Review the archive if this was not intentional.
-```
-
-**Output On Error (Archive Exists)**
-
-```markdown
-## Archive Failed
-
-**Change:** <change-name>
-**Target:** the archive path derived from `planningHome.changesDir`/<target-name>/
-
-Target archive directory already exists.
-
-**Options:**
-1. Rename the existing archive
-2. Delete the existing archive if it's a duplicate
-3. Wait until a different date to archive
-```
-
-**Capture procedure** (records durable project knowledge into the wiki):
-
-1. **Resolve the wiki.** Run `openspec context --json` (add `--store "<id>"` when a store is selected). If it reports `no_openspec_root` or fails, write nothing and tell the user the project needs OpenSpec set up first; never create `openspec/` as a side effect. Otherwise the wiki is `<root.path>/openspec/wiki/` (where `root.path` is the root returned by `openspec context --json`, with `--store "<id>"` when a store is selected). The folder is always named `wiki`.
-
-2. **Collect durable knowledge and evidence.** From the whole conversation, collect project background, goals, decisions and their rationale, constraints, open questions, terminology, people and systems involved, and reference material. Also review relevant project evidence; the conversation is not the only source:
-   - For a broad or initial capture, including a wiki that exists but lacks established project knowledge, inspect high-signal project documentation and configuration, OpenSpec specs and relevant change artifacts, project structure, and representative source. Capture a useful project overview, architecture, key flows, or design system only when the evidence supports it; do not create empty placeholder pages.
-   - For focused or repeated captures, inspect sources relevant to the requested topic and update existing wiki knowledge rather than repeating a broad inventory.
-   - Use current source and configuration to describe observed implementation. Use specs, proposals, designs, archived changes, and conversation for requirements, rationale, and historical or planned decisions; label these separately, and report conflicts that cannot be resolved.
-   - Record sources for material project claims in the concept's OKF `sources` metadata, and use portable repository-relative Markdown paths. A target that later becomes unavailable does not by itself make a concept nonconformant.
-   - Keep source review proportional to the topic; do not scan unrelated code or infer undocumented behavior.
-   Leave out chit-chat, step-by-step tool output, and anything already recorded. If the conversation and relevant project evidence contain no durable knowledge missing from the wiki, say so and write nothing, unless the user explicitly requested a format migration.
-
-3. **Read before writing.** If the wiki exists, read its root index when present and consult the pages related to what you collected. If no index is available, use relevant available concepts directly. Update an existing page in place when the topic is already covered; do not create a second page for the same topic. Preserve edits people made by hand and unrecognized frontmatter fields. When updating a legacy page, add OKF metadata to that page in place, preserving its body and links; do not migrate unrelated legacy pages during ordinary capture. If the user explicitly requests a full migration, upgrade every legacy concept in place. If the conversation contradicts a page, update it to the newer information, note on the page that it replaces earlier information, and tell the user.
-
-4. **Organize for navigation.** The wiki is a multi-level OKF v0.2 bundle of Markdown concepts. Every new or updated concept has parseable YAML frontmatter with a non-empty `type`; material evidence is represented in `sources` metadata. Choose categories and page boundaries to fit the knowledge being captured. Possible topics include project context, domain concepts, architecture and decisions, integrations, or research. Create folders and pages only when they help organize real content, not as empty placeholders. Keep an existing layout when it still works. Indexes are optional navigation aids; when an index exists, update it for pages added, changed, or moved in that directory. Create or update indexes when they improve discovery, not to satisfy a required layout or solely to declare a version. Only a root index may carry `okf_version: "0.2"`, and only when every non-reserved Markdown document conforms. A wiki without an index remains readable through its available concepts, and unavailable links do not by themselves make it nonconformant.
-
-5. **Preserve reference material.** Include references from the conversation and relevant project artifacts, such as image paths or links recorded in proposals and designs.
-   - **Proposal images:** When the current change's proposal or design links an image in its `references/` directory, copy that linked image into `<wiki>/assets/<change-name>/`. Link the wiki copy from the page that explains the requirement or decision it informed, and record the change name, reference path relative to the change root, and capture date. Do not link the wiki page to the active change path; it will move when archived.
-   - Links: record the link, its title, and the date in the page that uses it.
-   - Files (images, video, audio, PDFs, Word documents, other files): copy each accessible referenced file that supports captured knowledge into an `assets/` folder inside the wiki and link it from the page that uses it, recording the original source and the capture date. Ensure repository-relative asset links resolve on Windows, macOS, and Linux. Never move or modify the original. If a file is not accessible, record the reference and its original location and tell the user it was not copied.
-   - Markdown files copied as references: add minimal OKF `type: Reference` and source metadata to the wiki copy while preserving its body, then list it in the parent index.
-   - Very large files: state the file's size and ask the user before copying. If they decline, record the reference and original location without copying.
-   - **Git LFS, lazily:** only immediately before copying the first binary file in a capture, and not at all for text-only captures, check the project's Git setup. If the project is not a Git repository, skip this. Otherwise run `git lfs version`. If Git LFS is not installed, do not copy the binary: tell the user how to install it, and record the reference and original location instead. If it is installed, use `git check-attr filter -- <path>` to check the wiki destination and, for proposal images, the source under the change's `references/` directory. If either is not tracked with `filter=lfs`, run `git lfs install --local` and `git lfs track` with patterns covering the resolved wiki assets and change-reference paths, relative to the Git root. Tell the user which Git files changed (normally `.gitattributes`); do not ask for confirmation. Do not rewrite history or migrate files that are already committed.
-
-6. **Review the wiki.** After updating pages and copying accessible files, review the wiki for useful navigation and conflicts in the knowledge being captured. Check indexes that exist and update entries affected by this capture. When moving or reorganizing pages, update affected links whose destinations are known; unrelated missing indexes or unavailable links do not block capture or make the bundle nonconformant. Confirm every new or updated concept has parseable OKF frontmatter with a non-empty `type`. For an ordinary capture, leave unrelated legacy pages in place and do not declare the root version while any non-reserved Markdown document remains nonconformant; for an explicitly requested full migration, upgrade every legacy concept in place before declaring the version. Preserve unique information and hand edits. Keep existing structure and wording when they already work; do not make cosmetic rewrites.
-
-7. **Stay in bounds.** Write only under the wiki folder, plus the Git LFS files above. Never modify `openspec/specs/`, `openspec/changes/`, or project source. Do not merge wiki content into specs; the wiki is a separate knowledge layer that later proposals draw from.
-
-8. **Report.** List the pages created, updated, moved, or removed; assets copied; anything not copied and why; and whether the bundle is fully OKF v0.2-conformant or still contains legacy pages.
 
 **Guardrails**
-- Capture to the wiki before moving `changeRoot`, but never let a capture problem block the archive
 - Announce the selected change; prompt for selection when it is ambiguous
 - Use artifact graph (openspec status --json) for completion checking
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
-- If sync is requested, run the `/opsx-sync` workflow inline (agent-driven)
+- If sync is requested, run the `openspec-sync-specs` workflow inline if that skill is installed, or otherwise perform the delta-to-main-spec merge inline yourself (agent-driven either way)
+- When you merge inline because the sync skill is not installed, keep its safeguards. Delete a spec whose last requirement the delta removes only if the change's `.openspec.yaml` declares `retire_capabilities: true`, the spec has no other authored sections, and its path resolves inside the real specs root; otherwise stop before writing. After the merge, run `openspec validate --specs` with the same selected-root flags, and treat a failure as a failed sync: stop and leave `changeRoot` where it is
 - Never archive while a spec sync is still in flight — run the sync inline and verify the main specs before moving `changeRoot`
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting
 - Apply relevant runtime context and report conflicts; operation guidance remains advisory

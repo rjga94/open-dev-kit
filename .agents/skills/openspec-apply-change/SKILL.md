@@ -7,7 +7,6 @@ compatibility: Requires openspec CLI.
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.16.0"
 ---
 
 Implement tasks from an OpenSpec change.
@@ -20,12 +19,12 @@ One `"root": null` is not about setup: when a `status` error message starts with
 
 Otherwise, with no root, what happens next depends on how this workflow was reached:
 
-- **Auto-selected**: you chose this workflow yourself, without the user naming OpenSpec, naming this skill, or running its slash command. Stop using OpenSpec and answer the request normally, as you would with no OpenSpec installed. Do not ask them to set anything up and do not mention OpenSpec setup.
-- **Explicit OpenSpec request**: the user named OpenSpec, named this skill, or ran its slash command. Stop before writing and ask how to proceed: set this project up (`openspec init`), target a store they already have (`--store <id>`), or continue without OpenSpec for this request. Wait for their answer.
+- **Auto-selected**: you chose this workflow yourself, without the user naming OpenSpec, naming this skill, or invoking this skill by name. Stop using OpenSpec and answer the request normally, as you would with no OpenSpec installed. Do not ask them to set anything up and do not mention OpenSpec setup.
+- **Explicit OpenSpec request**: the user named OpenSpec, named this skill, or invoked this skill by name. Stop before writing and ask how to proceed: set this project up (`openspec init`), target a store they already have (`--store <id>`), or continue without OpenSpec for this request. Wait for their answer.
 
 In both branches, never create the root as a side effect: do not run `openspec init` until the user asks for it, do not hand-create `openspec/` files, and do not let a command create it.
 
-**Input**: Optionally specify a change name (e.g., `/opsx-apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+**Input**: Optionally specify a change name (e.g., `openspec-apply-change add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
 
@@ -36,7 +35,7 @@ In both branches, never create the root as a side effect: do not run `openspec i
    - Auto-select if only one active change exists
    - If ambiguous, run `openspec list --json` to get available changes and ask the user to select one
 
-   Always announce: "Using change: <name>" and how to override (e.g., `/opsx-apply <other>`).
+   Always announce: "Using change: <name>" and how to override (e.g., `openspec-apply-change <other>`).
 
 2. **Check status to understand the schema**
    ```bash
@@ -64,9 +63,9 @@ In both branches, never create the root as a side effect: do not run `openspec i
 
    **Handle states:**
    - If `state: "blocked"`: show the message and pause implementation.
-     - If `missingArtifacts` is non-empty: suggest completing the missing artifacts. Run `openspec status --change "<name>" --json`, select the next `ready` artifact (not `skipped` or `blocked`), and use `openspec instructions "<artifact-id>" --change "<name>" --json` for its rules and template. Keep the selected `--store <id>` on both commands.
+     - If `missingArtifacts` is non-empty: show the missing artifacts and the recovery step from the CLI’s `instruction` field. Keep the selected store on any follow-up command.
      - Otherwise, follow the CLI instruction to create or repair the schema-configured tracking file from existing planning artifacts. Do not assume another artifact is ready or start implementation while blocked.
-   - If `state: "all_done"`: defer completion handling until step 8 distinguishes tracked Apply completion tasks from legacy task files
+   - If `state: "all_done"`: report that all tracked tasks are complete and suggest review or verification as appropriate before archiving
    - Otherwise: proceed to implementation
 
    Treat `context` as a required prompt-level input. Read and consider it, and
@@ -94,17 +93,7 @@ In both branches, never create the root as a side effect: do not run `openspec i
    Do not copy `context` or `operationGuidance` verbatim into implementation
    files or planning artifacts unless the user separately asks for that content.
 
-5. **Check Git commit readiness**
-
-   This workflow commits its completed work. Before editing, confirm the current
-   directory is inside a Git repository and inspect `git status --short`,
-   including staged, unstaged, and untracked files. If there is no Git repository
-   or the index already contains staged changes, stop before implementation and
-   explain why the automatic commit cannot safely proceed. Record pre-existing
-   working-tree changes so they can be excluded from this workflow's commit.
-   Never clean, stash, reset, or discard them.
-
-6. **Show current progress**
+5. **Show current progress**
 
    Display:
    - Schema being used
@@ -112,39 +101,16 @@ In both branches, never create the root as a side effect: do not run `openspec i
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-7. **Implement tasks (loop until done or blocked)**
+6. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
-   - Make the code changes required, or perform the requested workflow action for a task in the final `## N. Apply completion` group
+   - Make the code changes required
    - Keep changes minimal and focused
-   - Verify the implemented behavior against the active change using proportionate checks that fit the software and available environment. When useful, launch the software in its environment and use UI interaction or other suitable methods relevant to the acceptance criteria.
-   - Keep checks focused on the active change. Prefer existing tests; if new code or setup is needed solely for verification, make it temporary and remove it after the check. Do not add or retain permanent project test files or infrastructure solely for verification.
-   - If the software or a suitable verification method cannot be run, report that limitation and do not claim the check passed.
    - Before editing, confirm the checkbox at the returned `sourcePath` and `line` still matches the task description; if it does not, rerun the apply instructions and use the refreshed location
    - Mark the task complete at its returned `sourcePath` and `line`: `- [ ]` → `- [x]`
    - Rerun the apply instructions and confirm that task is now done and progress changed
    - Continue to next task
-
-   **Tracked Apply completion group**
-
-   If the task file has a final numbered heading ending in `Apply completion`,
-   its four checkboxes are real tasks. Do not wait for `state: "all_done"` before
-   executing them. Complete them in order, and do not start this group until
-   every task before it is complete:
-
-   1. **Sync delta specs**: run `/opsx-sync "<name>"` and verify the main specs reflect every delta requirement. If there are no delta specs, verify that none exist and mark this task complete as a no-op.
-   2. **Capture wiki knowledge**: run `/opsx-capture` to apply the canonical capture procedure to this change. If there is nothing new to record, report that and mark this task complete as a no-op.
-   3. **Archive the change**: only after the sync and capture tasks are checked, locate the archive task checkbox in the active tasks file, mark it complete, save the file, and verify that exact checkbox is checked before invoking archive. Then run `openspec archive "<name>" --skip-specs --yes` (include the selected store flag when applicable). The explicit sync task has already merged and verified the delta specs, so `--skip-specs` prevents a second merge. `--yes` allows the still-pending commit task to remain tracked during archive. On success, verify the archive destination, locate the moved tasks file, and confirm the archive task is still checked before continuing with that archived path. If archive reports failure, inspect whether the change remains active: if it does, restore only the archive task checkbox to incomplete, save and verify it, then stop; if the change has moved, preserve the checked status, inspect the archived task file, report the command error, and stop before commit. Do not rerun apply instructions after the change is archived.
-   4. **Commit the work**: stage only files changed for this change by implementation, task progress, sync, wiki capture, or archive. Do not use `git add .` or `git add -A`, and do not include pre-existing changes. Mark the commit checkbox in the archived tasks file as part of preparing this commit, stage that file, then commit with a concise message and verify the commit hash. Treat the task as complete only after the commit succeeds; if it fails, restore the checkbox to incomplete and report the error.
-
-
-
-   For sync and capture tasks, mark their checkbox after verification and refresh
-   apply instructions as usual. After archive moves the change, verify the
-   archive task remains checked in the archived file and update the commit task
-   checkbox there when preparing the commit; the active-change instructions no
-   longer apply. Leave all later lifecycle tasks unchecked if a step fails.
 
    **Pause if:**
    - Task is unclear → ask for clarification
@@ -153,44 +119,12 @@ In both branches, never create the root as a side effect: do not run `openspec i
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-   If implementation stops while tasks before the Apply completion group remain
-   incomplete, report progress and do not start that group. If a lifecycle task
-   fails, report progress and do not run any later lifecycle task.
-
-8. **Finish tracked Apply completion tasks or legacy closeout**
-
-   If the task file has the final numbered `Apply completion` group, its sync,
-   wiki capture, archive, and commit actions are already executed through the
-   tracked task loop. Verify the archived task checkboxes and successful commit;
-   do not run the automatic closeout again.
-
-   For older task files without that group, retain the automatic closeout:
-   re-run `openspec instructions apply --change "<name>" --json` and continue
-   only when it reports `state: "all_done"` and zero remaining tasks. If any
-   task is incomplete, stop without starting closeout.
-
-   Pass the exact **Apply completion mode** handoff to the archive workflow:
-   "run `/opsx-archive "<name>"` in Apply completion mode: sync its delta specs, archive it, and do not ask for confirmation". The archive workflow syncs delta specs before moving the
-   change and does not ask for confirmation in this mode. If sync, archive, or
-   verification fails or reports a blocker, stop; do not commit.
-
-   After archive succeeds, stage only files changed for this change by
-   implementation, task progress, sync, or archive. Do not use `git add .` or
-   `git add -A`, and do not include pre-existing changes. If a changed file
-   contains unrelated pre-existing edits that cannot be isolated safely, stop
-   before committing and report it.
-
-   Generate a concise commit message from the change's intent and completed work
-   (for example, `feat: complete <change-name>`), then commit without asking
-   for confirmation. Verify that the commit succeeded. If staging or committing
-   fails, report the error and do not claim the pipeline completed.
-
-9. **On completion or pause, show status**
+7. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: report the sync and wiki capture results, archive location, generated commit message, and commit hash
+   - If all done: report that tracked tasks are complete and suggest review or verification as appropriate before archiving
    - If paused: explain why and wait for guidance
 
 **Output During Implementation**
@@ -221,7 +155,8 @@ Working on task 4/7: <task description>
 - [x] Task 2
 ...
 
-All tracked tasks are complete, including sync, wiki capture, archive, and commit.
+All tracked tasks are complete. Review or verify the change as appropriate
+before archiving. Review the completed work, then ask to archive this change.
 ```
 
 **Output On Pause (Issue Encountered)**
@@ -236,8 +171,12 @@ All tracked tasks are complete, including sync, wiki capture, archive, and commi
 ### Issue Encountered
 <description of the issue>
 
-No later lifecycle tasks were run after the blocker. Resolve it and run
-`/opsx-apply` again to continue; completed task checkboxes remain checked.
+**Options:**
+1. <option 1>
+2. <option 2>
+3. Other approach
+
+What would you like to do?
 ```
 
 **Guardrails**
@@ -257,9 +196,6 @@ No later lifecycle tasks were run after the blocker. Resolve it and run
 - Consider every guidance entry; explain any inapplicable or conflicting advice
 - Do not copy runtime context or operation guidance into implementation files or planning artifacts
 - Preserve CLI-controlled blocked/ready/all-done behavior and completion criteria
-- For a tracked Apply completion group, run each lifecycle action only after all preceding tasks are complete; for legacy task files, use automatic closeout only at `state: "all_done"`
-- Do not repeat sync, wiki capture, archive, or commit after a tracked Apply completion group succeeds
-- Preserve unrelated staged, unstaged, and untracked work; commit only this change's completed work
 
 **Fluid Workflow Integration**
 
