@@ -76,6 +76,6 @@ When the Wiki module is enabled, ask the internal Wiki specialist to check for `
 - If no Wiki exists, report that to ODK so it can ask whether the user explicitly wants to seed one. Do not scan repository content or create a Wiki unless the user opts in.
 - If an existing Wiki has integrity issues, report findings and offer repair or reseeding. Do not start a repository/history seed unless the user explicitly chooses reseed and approves that scan.
 - After the user's choice, have Wiki prepare the chosen operation and its proposed file changes. ODK must present the changes and obtain approval before any Wiki writes. If the user declines, leave the Wiki unchanged.
-- Repair is limited to the approved Wiki changes and must not perform a broad repository/history scan. Reseeding follows `.opendevkit/workflows/wiki-seed.md`, including pre-context screening and provenance requirements.
+- Repair is limited to the approved Wiki changes and must not perform a broad repository/history scan. Reseeding follows `.opendevkit/modules/wiki/workflows/wiki-seed.md`, including pre-context screening and provenance requirements.
 
 Return the check findings, chosen action, and approval state to ODK. Keep Wiki diagnostics read-only until ODK confirms that the user approved the proposed changes.

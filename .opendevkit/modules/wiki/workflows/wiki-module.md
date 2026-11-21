@@ -31,4 +31,4 @@ If conflicting information cannot be reconciled safely, preserve it and ask ODK 
 
 ## OKF v0.2 and taxonomy
 
-Use `.opendevkit/workflows/wiki-okf-v0.2.md` for the canonical concept, source, reserved-file, and root-index requirements. Use `.opendevkit/workflows/wiki-taxonomy.md` for category guidance. Suggested categories are optional; create or refactor them only when project knowledge warrants it, and keep all documents inside the single Wiki bundle.
+Use `.opendevkit/modules/wiki/workflows/wiki-okf-v0.2.md` for the canonical concept, source, reserved-file, and root-index requirements. Use `.opendevkit/modules/wiki/workflows/wiki-taxonomy.md` for category guidance. Suggested categories are optional; create or refactor them only when project knowledge warrants it, and keep all documents inside the single Wiki bundle.

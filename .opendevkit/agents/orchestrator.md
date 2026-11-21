@@ -61,7 +61,7 @@ Optional module setup is a separate approved setup flow:
 - Read `.opendevkit/config.json` before optional-module questions. Treat a missing `preferences.optionalModulesSetup` as `"pending"` for older configs.
 - Ask for optional-module selection only while setup is pending or when the user explicitly requests module changes. Never re-ask after setup is configured unless requested.
 - Confirm a different target workspace before preparing setup there. For a pending setup, explain that selecting no modules is valid.
-- Require explicit approval of an exact plan naming every affected path and material change before optional-module or configuration writes. Readiness may read the manifest and selected module sources only as needed.
+- Require explicit approval of an exact plan naming every affected path and material change before optional-module or configuration writes. Readiness may read the manifest and selected module sources only as needed, resolving canonical sources from paths such as `.opendevkit/modules/wiki/` while preserving each manifest `installAs` destination.
 - After approval, record only fully installed selected modules in `enabledModules`, including `[]` for none, and set `preferences.optionalModulesSetup: "configured"` when the selection is complete while preserving unrelated configuration. A declined plan leaves files and configuration unchanged and setup pending.
 - Ask separately before replacing a conflicting optional-module file. If replacement is declined, leave all files for that module unchanged, do not enable it, and keep setup pending; continue with other approved modules only when safe.
 

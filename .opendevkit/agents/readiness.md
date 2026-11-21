@@ -12,7 +12,7 @@ Prepare guidance or documentation updates using existing locations and conventio
 
 Read `.opendevkit/config.json` before optional-module questions. If `preferences.optionalModulesSetup` is absent, treat it as `"pending"`. Ask for a module selection only while it is pending or the user explicitly asks to change modules; do not re-ask a configured setup without an explicit change request.
 
-If setup targets a workspace other than the active project, confirm the target workspace with ODK before preparing changes. Read `.opendevkit/agents/manifest.json` and selected optional-module source entries only as needed. Prepare an exact plan naming every affected path and the material/configuration change. Wait for explicit plan approval before any optional-module or configuration write.
+If setup targets a workspace other than the active project, confirm the target workspace with ODK before preparing changes. Read `.opendevkit/agents/manifest.json` and selected optional-module source entries only as needed. Resolve each source from the manifest's canonical module path, including `.opendevkit/modules/wiki/` for Wiki, and copy or install according to the corresponding `installAs` destination. Prepare an exact plan naming every affected path and the material/configuration change. Wait for explicit plan approval before any optional-module or configuration write.
 
 - An approved plan: record only fully installed selected modules in `enabledModules`, including `[]` for none, and set `preferences.optionalModulesSetup: "configured"` when the selection is complete. Preserve all unrelated configuration.
 - A declined plan: leave module files and configuration unchanged and leave setup pending.

@@ -38,8 +38,8 @@
       "agent": {
         "id": "wiki",
         "name": "ODK Wiki",
-        "source": ".opendevkit/agents/wiki.md",
-        "profileTemplate": ".opendevkit/agents/odk-wiki.agent.md",
+        "source": ".opendevkit/modules/wiki/agents/wiki.md",
+        "profileTemplate": ".opendevkit/modules/wiki/agents/odk-wiki.agent.md",
         "installAs": ".github/agents/odk-wiki.agent.md",
         "userInvocable": false,
         "tools": ["read", "search", "edit", "execute"]
@@ -52,17 +52,17 @@
       "skills": [
         {
           "name": "odk-wiki-capture",
-          "source": ".opendevkit/skill-templates/odk-wiki-capture/SKILL.md",
+          "source": ".opendevkit/modules/wiki/skills/odk-wiki-capture/SKILL.md",
           "installAs": ".github/skills/odk-wiki-capture/SKILL.md"
         },
         {
           "name": "odk-wiki-query",
-          "source": ".opendevkit/skill-templates/odk-wiki-query/SKILL.md",
+          "source": ".opendevkit/modules/wiki/skills/odk-wiki-query/SKILL.md",
           "installAs": ".github/skills/odk-wiki-query/SKILL.md"
         },
         {
           "name": "odk-wiki-seed",
-          "source": ".opendevkit/skill-templates/odk-wiki-seed/SKILL.md",
+          "source": ".opendevkit/modules/wiki/skills/odk-wiki-seed/SKILL.md",
           "installAs": ".github/skills/odk-wiki-seed/SKILL.md"
         }
       ]

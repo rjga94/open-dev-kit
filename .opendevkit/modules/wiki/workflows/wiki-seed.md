@@ -20,10 +20,10 @@ Do not open candidate source content in model context until it has passed these 
 - If the Wiki does not exist, create its OKF-compatible bundle and seed eligible knowledge. If it exists, review every page and relationship for duplicates or conflicts, stale claims, broken links, index consistency, provenance, taxonomy, and format before reconciling new knowledge.
 - Distinguish explicit user intent, current implemented behavior, and external context. Preserve these distinctions when evidence differs.
 - Replace or remove Wiki claims superseded by authoritative current evidence. Do not keep historical copies in the Wiki; Git remains the historical record.
-- Follow `.opendevkit/workflows/wiki-taxonomy.md`; create categories only when eligible project knowledge warrants them. Preserve unique knowledge and provenance, repair affected links and indexes, and leave unaffected pages unchanged.
+- Follow `.opendevkit/modules/wiki/workflows/wiki-taxonomy.md`; create categories only when eligible project knowledge warrants them. Preserve unique knowledge and provenance, repair affected links and indexes, and leave unaffected pages unchanged.
 - Change an existing page only to correct a substantive content, provenance, structure, link, index, or format issue, or to integrate new eligible knowledge. Do not rewrite, re-title, re-describe, reformat, or otherwise touch an unaffected page for stylistic consistency. Update only navigation entries affected by actual page changes.
 - If conflicts cannot be reconciled safely, preserve the conflicting knowledge and ask ODK to obtain clarification. Do not guess or delete content.
-- Validate the finished bundle against `.opendevkit/workflows/wiki-okf-v0.2.md`. Do not declare conformance when any non-reserved Markdown page fails validation.
+- Validate the finished bundle against `.opendevkit/modules/wiki/workflows/wiki-okf-v0.2.md`. Do not declare conformance when any non-reserved Markdown page fails validation.
 
 ## Report
 
