@@ -8,7 +8,7 @@ The optional Wiki module keeps durable project knowledge in one OKF v0.2 bundle 
 - `/odk-wiki-query` searches only `.opendevkit/wiki/`. If the Wiki does not contain the answer, report the gap; do not search project files, Git history, or external sites.
 - `/odk-wiki-seed` creates or refreshes the Wiki from screened current repository content and Git history only after explicit user opt-in. Bootstrap and capture do not seed automatically.
 
-The VS Code skill shims for these operations use the `odk-` prefix and delegate through ODK. The specialist remains hidden and does not communicate directly with the user or invoke sibling agents.
+Host adapter surfaces for these operations use the `odk-` prefix and delegate through the orchestrator. The specialist remains hidden and does not communicate directly with the user or invoke sibling agents.
 
 ## Evidence and source handling
 
@@ -31,4 +31,4 @@ If conflicting information cannot be reconciled safely, preserve it and ask ODK 
 
 ## OKF v0.2 and taxonomy
 
-Use `.opendevkit/modules/wiki/workflows/wiki-okf-v0.2.md` for the canonical concept, source, reserved-file, and root-index requirements. Use `.opendevkit/modules/wiki/workflows/wiki-taxonomy.md` for category guidance. Suggested categories are optional; create or refactor them only when project knowledge warrants it, and keep all documents inside the single Wiki bundle.
+Use `.opendevkit/modules/wiki/core/standards/wiki-okf-v0.2.md` for the canonical concept, source, reserved-file, and root-index requirements. Use `.opendevkit/modules/wiki/core/standards/wiki-taxonomy.md` for category guidance. Suggested categories are optional; create or refactor them only when project knowledge warrants it, and keep all documents inside the single Wiki bundle.

@@ -35,37 +35,54 @@
   ],
   "optionalModules": {
     "wiki": {
-      "agent": {
-        "id": "wiki",
-        "name": "ODK Wiki",
-        "source": ".opendevkit/modules/wiki/agents/wiki.md",
-        "profileTemplate": ".opendevkit/modules/wiki/agents/odk-wiki.agent.md",
-        "installAs": ".github/agents/odk-wiki.agent.md",
-        "userInvocable": false,
-        "tools": ["read", "search", "edit", "execute"]
+      "core": {
+        "specialist": ".opendevkit/modules/wiki/core/specialist.md",
+        "workflows": [
+          ".opendevkit/modules/wiki/core/workflows/wiki-module.md",
+          ".opendevkit/modules/wiki/core/workflows/wiki-capture.md",
+          ".opendevkit/modules/wiki/core/workflows/wiki-query.md",
+          ".opendevkit/modules/wiki/core/workflows/wiki-seed.md"
+        ],
+        "standards": [
+          ".opendevkit/modules/wiki/core/standards/wiki-okf-v0.2.md",
+          ".opendevkit/modules/wiki/core/standards/wiki-taxonomy.md"
+        ]
       },
-      "commands": [
-        "odk-wiki-capture",
-        "odk-wiki-query",
-        "odk-wiki-seed"
-      ],
-      "skills": [
-        {
-          "name": "odk-wiki-capture",
-          "source": ".opendevkit/modules/wiki/skills/odk-wiki-capture/SKILL.md",
-          "installAs": ".github/skills/odk-wiki-capture/SKILL.md"
-        },
-        {
-          "name": "odk-wiki-query",
-          "source": ".opendevkit/modules/wiki/skills/odk-wiki-query/SKILL.md",
-          "installAs": ".github/skills/odk-wiki-query/SKILL.md"
-        },
-        {
-          "name": "odk-wiki-seed",
-          "source": ".opendevkit/modules/wiki/skills/odk-wiki-seed/SKILL.md",
-          "installAs": ".github/skills/odk-wiki-seed/SKILL.md"
+      "adapters": {
+        "github-copilot": {
+          "agent": {
+            "id": "wiki",
+            "name": "ODK Wiki",
+            "source": ".opendevkit/modules/wiki/core/specialist.md",
+            "profileTemplate": ".opendevkit/modules/wiki/adapters/github-copilot/agent.md",
+            "installAs": ".github/agents/odk-wiki.agent.md",
+            "userInvocable": false,
+            "tools": ["read", "search", "edit", "execute"]
+          },
+          "commands": [
+            "odk-wiki-capture",
+            "odk-wiki-query",
+            "odk-wiki-seed"
+          ],
+          "skills": [
+            {
+              "name": "odk-wiki-capture",
+              "source": ".opendevkit/modules/wiki/adapters/github-copilot/skills/odk-wiki-capture/SKILL.md",
+              "installAs": ".github/skills/odk-wiki-capture/SKILL.md"
+            },
+            {
+              "name": "odk-wiki-query",
+              "source": ".opendevkit/modules/wiki/adapters/github-copilot/skills/odk-wiki-query/SKILL.md",
+              "installAs": ".github/skills/odk-wiki-query/SKILL.md"
+            },
+            {
+              "name": "odk-wiki-seed",
+              "source": ".opendevkit/modules/wiki/adapters/github-copilot/skills/odk-wiki-seed/SKILL.md",
+              "installAs": ".github/skills/odk-wiki-seed/SKILL.md"
+            }
+          ]
         }
-      ]
+      }
     }
   },
   "delegation": {

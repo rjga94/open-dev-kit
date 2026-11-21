@@ -34,10 +34,11 @@ in the manifest and these core guidance files; do not copy Wiki agents,
 `wiki-*` workflows, optional skill templates, Wiki content, or the rest of the
 source repository.
 For optional modules, canonical source assets live under `.opendevkit/modules/<module>/`;
-use the manifest's `source` entries to resolve them and its `installAs` entries for
-target destinations. Wiki canonical sources live under
-`.opendevkit/modules/wiki/`; do not confuse them with the runtime Wiki bundle at
-`.opendevkit/wiki/`.
+use the manifest's core and adapter entries to resolve them and each adapter
+`installAs` entry for its target destination. Wiki shared sources live under
+`.opendevkit/modules/wiki/core/`; its GitHub Copilot adapter sources live under
+`.opendevkit/modules/wiki/adapters/github-copilot/`. Do not confuse either source
+tree with the runtime Wiki bundle at `.opendevkit/wiki/`.
 
 Do not ask which optional modules to enable. Do not ask about setting
 workspace permissions to Allow all, and do not change workspace or user-wide
