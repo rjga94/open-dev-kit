@@ -7,19 +7,19 @@ This capability lets a user bootstrap selected AI development kit modules into a
 ## Requirements
 
 ### Requirement: User selects optional kit modules during bootstrap
-The GitHub-hosted bootstrap guidance SHALL interview the user to identify which optional kit modules to enable and SHALL enable only the modules the user selects. It SHALL install the core orchestrator, Readiness specialist, and Implementation specialist regardless of optional module selection, and SHALL NOT initialize or seed module data as part of selection.
+The GitHub-hosted install guidance SHALL install the core orchestrator, Readiness specialist, and Implementation specialist without asking about optional modules. After core installation, `/odk-readiness-refactor` SHALL ask which optional modules to enable and SHALL enable only those selected after the user approves the proposed changes. It SHALL NOT seed module data.
 
 #### Scenario: User selects optional modules
-- **WHEN** the user selects one or more modules during bootstrap
+- **WHEN** the user selects one or more optional modules during `/odk-readiness-refactor`
 - **THEN** only the selected optional modules are enabled in addition to the core kit
 
 #### Scenario: User selects no modules
-- **WHEN** the user selects no modules
+- **WHEN** the user selects no optional modules during `/odk-readiness-refactor`
 - **THEN** no optional modules are enabled and the core orchestrator, Readiness specialist, and Implementation specialist remain installed
 
 #### Scenario: Wiki is selected
-- **WHEN** the user selects the Wiki module during installation
-- **THEN** the bootstrap enables its commands without creating or seeding Wiki content
+- **WHEN** the user selects the Wiki module during `/odk-readiness-refactor`
+- **THEN** the approved setup enables its commands without creating or seeding Wiki content
 
 ### Requirement: Readiness is a core specialist
 The kit SHALL include the internal Readiness specialist with the orchestrator in every installation; its availability SHALL NOT depend on optional module selection.
@@ -54,11 +54,11 @@ The bootstrap workflow SHALL place canonical kit configuration and module-owned 
 - **THEN** its canonical configuration and project data are stored under `.opendevkit/`
 
 ### Requirement: Bootstrap guidance is available before installation
-The kit source SHALL include canonical bootstrap guidance that an AI can retrieve from the supplied GitHub repository and follow when the user requests installation in an ordinary chat prompt. Initial installation SHALL NOT depend on a pre-installed kit skill.
+The kit source SHALL include canonical installation guidance in `INSTALL.md` that an AI can retrieve from the supplied GitHub repository and follow when the user requests installation in an ordinary chat prompt. Initial installation SHALL NOT depend on a pre-installed kit skill.
 
 #### Scenario: User starts from a clean project
 - **WHEN** the user asks an AI to install the kit from its GitHub repository in a project with no kit skills installed
-- **THEN** the AI can retrieve and follow the repository's bootstrap guidance to interview the user and install selected kit content
+- **THEN** the AI can retrieve and follow `INSTALL.md` to install core kit content without an installation interview
 
 ### Requirement: Kit commands use the odk prefix
 Every user-invokable VS Code skill provided by the kit SHALL have a command name beginning with `odk-`.
@@ -72,15 +72,15 @@ Every user-invokable VS Code skill provided by the kit SHALL have a command name
 - **THEN** the kit does not require or install a persistent `/odk-install` command
 
 ### Requirement: Bootstrap preserves existing project files
-The bootstrap workflow SHALL preserve existing project and Wiki content and SHALL ask before replacing a conflicting file.
+The installation workflow SHALL preserve existing project and Wiki content. Before writing any core kit file, it SHALL check for conflicts; if any core target conflicts with existing content, it SHALL report the conflicting paths and stop without writing any core files.
 
 #### Scenario: No file conflict
-- **WHEN** the bootstrap adds kit files that do not conflict with existing files
-- **THEN** existing project files remain unchanged
+- **WHEN** all core kit target paths are absent or already contain the same ODK content
+- **THEN** the installer adds missing core files and leaves existing files unchanged
 
 #### Scenario: File conflict
-- **WHEN** a kit file conflicts with an existing project file
-- **THEN** the bootstrap asks before replacing the existing file
+- **WHEN** any core kit target path contains different content
+- **THEN** the installer reports the conflicting path or paths and stops before writing any core files
 
 ### Requirement: Kit agents use the selected Copilot model
 The ODK orchestrator and installed specialist agents SHALL use the model selected through the normal VS Code Copilot interface, without requiring a separate kit model or provider setting.
@@ -120,23 +120,27 @@ The bootstrap SHALL install a user-selectable VS Code Copilot agent facade for t
 - **THEN** the user is told to select ODK from the Agent picker, and the installation does not claim to change VS Code's default agent
 
 ### Requirement: Workspace Allow all requires explicit opt-in
-The bootstrap SHALL offer to set the workspace's default permissions for new chat sessions to Allow all only after explicit user consent, and SHALL NOT change user-wide settings.
+The Readiness workflow SHALL check the workspace's default permissions before offering to set new chat sessions to Allow all, shall offer the setting only when it is not already enabled, and SHALL NOT change user-wide settings. The core installation workflow SHALL NOT offer or change this setting.
 
 #### Scenario: User opts in to workspace Allow all
-- **WHEN** the user explicitly accepts the Allow all option
+- **WHEN** the user explicitly accepts the Allow all option during `/odk-readiness-refactor`
 - **THEN** the workspace default for new chat sessions is set to Allow all and the user is told it applies to all agents in that workspace
 
 #### Scenario: User declines workspace Allow all
-- **WHEN** the user declines the Allow all option
-- **THEN** the bootstrap leaves the workspace permission setting unchanged
+- **WHEN** the user declines the Allow all option during `/odk-readiness-refactor`
+- **THEN** the workspace permission setting remains unchanged
+
+#### Scenario: Workspace Allow all is already enabled
+- **WHEN** the workspace default for new chat sessions is already Allow all
+- **THEN** Readiness does not ask the user to enable it again
 
 #### Scenario: Existing workspace settings are present
 - **WHEN** the user opts in and `.vscode/settings.json` already contains settings
-- **THEN** the bootstrap changes only the relevant chat permission setting and preserves unrelated settings
+- **THEN** only the relevant chat permission setting is changed and unrelated settings are preserved
 
 #### Scenario: VS Code or organization policy blocks Allow all
 - **WHEN** workspace trust or organization policy prevents the permission setting from taking effect
-- **THEN** the bootstrap reports that Allow all could not be enabled and does not attempt to bypass the restriction
+- **THEN** the Readiness workflow reports that Allow all could not be enabled and does not attempt to bypass the restriction
 
 ### Requirement: Specialized agents communicate through the orchestrator
 Specialized agents SHALL return results and clarification requests to the orchestrator and SHALL NOT communicate directly with users or other specialized agents.

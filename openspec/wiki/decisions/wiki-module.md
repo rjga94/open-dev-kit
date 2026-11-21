@@ -1,9 +1,9 @@
 ---
 type: decision
 title: Wiki module is optional
-description: Bootstrap installs Wiki capabilities only when selected and does not seed Wiki data during installation.
+description: Readiness enables Wiki capabilities only when selected; core installation does not seed Wiki data.
 sources:
-  - resource: "project:BOOTSTRAP.md"
+  - resource: "project:INSTALL.md"
   - resource: "project:.opendevkit/agents/manifest.json"
   - resource: "project:.opendevkit/workflows/wiki-module.md"
   - resource: "project:openspec/specs/project-wiki/spec.md"
@@ -12,9 +12,9 @@ sources:
 
 # Wiki module is optional
 
-The ODK Wiki module is optional. Bootstrap installs its specialist and
-`/odk-wiki-*` commands only when selected; installation does not create or
-seed Wiki content. Capture requires an initialized Wiki, while repository and
+The ODK Wiki module is optional. Readiness enables its specialist and
+`/odk-wiki-*` commands only when selected; core installation does not create
+or seed Wiki content. Capture requires an initialized Wiki, while repository and
 Git-history seeding is a distinct, explicitly invoked operation with
 pre-context screening requirements.
 

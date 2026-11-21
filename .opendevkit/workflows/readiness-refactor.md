@@ -32,6 +32,35 @@ After ODK obtains the necessary answers:
 
 Report evidence, classifications, targeted clarification needs, proposed changes, and checks performed to ODK. Do not claim a change was applied unless it was approved and written successfully. Report any write failure and the exact files successfully changed; do not claim the approved set was fully applied if any write failed.
 
+## Optional module setup
+
+Before asking optional-module questions, inspect `.opendevkit/config.json`:
+
+- If `preferences.optionalModulesSetup` is missing, treat setup as `"pending"` (migration behavior for older configs).
+- Ask which optional modules to enable only if setup is pending or the user explicitly requests module changes.
+- If setup is configured and no change was requested, preserve `enabledModules` and do not ask again.
+- If setup is for a workspace other than the active project, confirm the target workspace before preparing it.
+- Selecting no modules is valid and means `enabledModules: []`.
+
+After the user makes a selection, prepare a complete exact plan before writes. Use `.opendevkit/agents/manifest.json` for destinations and read each selected optional-module source only as needed. Name every affected path and describe the proposed material/configuration change. Obtain explicit approval for the plan before any write.
+
+- If approved, record only fully installed selected modules in `enabledModules` and set `preferences.optionalModulesSetup: "configured"` when the selection is complete, including `[]` for no modules. Preserve unrelated config preferences.
+- If declined, leave all optional-module files and configuration unchanged and leave setup pending.
+- Never re-ask about a configured selection merely because the readiness workflow ran again; reopen only for an explicit module-change request.
+
+After overall plan approval, inspect each optional-module destination. If an existing file differs from its proposed content, ask ODK to obtain a separate replacement decision for that exact path. If replacement is declined, leave all files for that module unchanged, do not enable it, and keep setup pending; other independently approved modules may proceed if safe. Never write a conflicting file by assumption. A planned write that fails or becomes unsafe must be reported separately, and no unapproved alternatives may be applied.
+
+## Workspace Allow all check
+
+Before offering Allow all, read the workspace `.vscode/settings.json` and inspect `chat.defaultConfiguration.approvals`.
+
+- If the value is `"allowAll"`, do not offer or ask again.
+- If missing or not `"allowAll"`, ask for explicit opt-in to change it.
+- A decline leaves workspace settings unchanged.
+- After consent, change only `chat.defaultConfiguration.approvals` to `"allowAll"` in the workspace file.
+- Preserve JSONC/comments and unrelated settings. Do not modify user-level settings or bypass workspace trust or organization policy.
+- If trust or policy prevents the setting, report the restriction and leave it unchanged.
+
 ## Optional OpenSpec setup
 
 Assess whether the project already has OpenSpec configuration and project-scoped GitHub Copilot workflow skills. If either is missing, report that state to ODK and offer setup for this project; do not install or initialize automatically. If OpenSpec is already configured, inspect and integrate with it rather than reinitializing or replacing its configuration.

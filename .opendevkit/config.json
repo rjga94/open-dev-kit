@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "enabledModules": [],
   "preferences": {
-    "postArchiveWikiCapture": "not-offered"
+    "postArchiveWikiCapture": "not-offered",
+    "optionalModulesSetup": "pending"
   }
 }
