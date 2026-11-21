@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "id": "wiki",
+  "files": [
+    {
+      "id": "specialist",
+      "source": ".opendevkit/modules/wiki/core/specialist.md",
+      "installAs": ".opendevkit/modules/wiki/core/specialist.md",
+      "host": "core"
+    },
+    {
+      "id": "workflow-module",
+      "source": ".opendevkit/modules/wiki/core/workflows/wiki-module.md",
+      "installAs": ".opendevkit/modules/wiki/core/workflows/wiki-module.md",
+      "host": "core"
+    },
+    {
+      "id": "workflow-capture",
+      "source": ".opendevkit/modules/wiki/core/workflows/wiki-capture.md",
+      "installAs": ".opendevkit/modules/wiki/core/workflows/wiki-capture.md",
+      "host": "core"
+    },
+    {
+      "id": "workflow-query",
+      "source": ".opendevkit/modules/wiki/core/workflows/wiki-query.md",
+      "installAs": ".opendevkit/modules/wiki/core/workflows/wiki-query.md",
+      "host": "core"
+    },
+    {
+      "id": "workflow-seed",
+      "source": ".opendevkit/modules/wiki/core/workflows/wiki-seed.md",
+      "installAs": ".opendevkit/modules/wiki/core/workflows/wiki-seed.md",
+      "host": "core"
+    },
+    {
+      "id": "standard-okf",
+      "source": ".opendevkit/modules/wiki/core/standards/wiki-okf-v0.2.md",
+      "installAs": ".opendevkit/modules/wiki/core/standards/wiki-okf-v0.2.md",
+      "host": "core"
+    },
+    {
+      "id": "standard-taxonomy",
+      "source": ".opendevkit/modules/wiki/core/standards/wiki-taxonomy.md",
+      "installAs": ".opendevkit/modules/wiki/core/standards/wiki-taxonomy.md",
+      "host": "core"
+    },
+    {
+      "id": "copilot-agent-profile",
+      "source": ".opendevkit/modules/wiki/adapters/github-copilot/agent.md",
+      "installAs": ".github/agents/odk-wiki.agent.md",
+      "host": "github-copilot"
+    },
+    {
+      "id": "copilot-skill-capture",
+      "source": ".opendevkit/modules/wiki/adapters/github-copilot/skills/odk-wiki-capture/SKILL.md",
+      "installAs": ".github/skills/odk-wiki-capture/SKILL.md",
+      "host": "github-copilot"
+    },
+    {
+      "id": "copilot-skill-query",
+      "source": ".opendevkit/modules/wiki/adapters/github-copilot/skills/odk-wiki-query/SKILL.md",
+      "installAs": ".github/skills/odk-wiki-query/SKILL.md",
+      "host": "github-copilot"
+    },
+    {
+      "id": "copilot-skill-seed",
+      "source": ".opendevkit/modules/wiki/adapters/github-copilot/skills/odk-wiki-seed/SKILL.md",
+      "installAs": ".github/skills/odk-wiki-seed/SKILL.md",
+      "host": "github-copilot"
+    }
+  ],
+  "adapters": {
+    "github-copilot": {
+      "agent": {
+        "id": "wiki",
+        "name": "ODK Wiki",
+        "specialistFile": "specialist",
+        "profileFile": "copilot-agent-profile",
+        "userInvocable": false,
+        "tools": ["read", "search", "edit", "execute"]
+      },
+      "commands": [
+        "odk-wiki-capture",
+        "odk-wiki-query",
+        "odk-wiki-seed"
+      ],
+      "skills": [
+        {"name": "odk-wiki-capture", "file": "copilot-skill-capture"},
+        {"name": "odk-wiki-query", "file": "copilot-skill-query"},
+        {"name": "odk-wiki-seed", "file": "copilot-skill-seed"}
+      ]
+    }
+  }
+}
