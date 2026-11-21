@@ -15,11 +15,11 @@
       "copilotProfile": ".github/agents/odk-readiness.agent.md",
       "userInvocable": false,
       "tools": ["read", "search", "edit", "execute"],
-      "commands": ["odk-readiness-refactor"],
+      "commands": ["odk-readiness-check"],
       "skills": [
         {
-          "name": "odk-readiness-refactor",
-          "source": ".github/skills/odk-readiness-refactor/SKILL.md",
+          "name": "odk-readiness-check",
+          "source": ".github/skills/odk-readiness-check/SKILL.md",
           "canonicalWorkflow": ".opendevkit/workflows/readiness-refactor.md"
         }
       ]

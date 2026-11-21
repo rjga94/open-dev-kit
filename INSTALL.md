@@ -62,7 +62,7 @@ Do not delete or change pre-existing optional files or data.
 Do not ask which optional modules to enable. Do not ask about setting
 workspace permissions to Allow all, and do not change workspace or user-wide
 permissions. Optional setup is handled after installation by
-`/odk-readiness-refactor`.
+`/odk-readiness-check`.
 
 ## Preflight every core destination before writing
 

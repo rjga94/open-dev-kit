@@ -40,11 +40,25 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
         self.assertIn("No Wiki-specific answer is needed", guide)
         self.assertIn("Do not ask whether to\nseed or repair Wiki data", guide)
 
+    def test_readiness_command_metadata_uses_only_the_new_name(self):
+        readiness = read(".opendevkit/agents/readiness.md")
+        catalog = read(".opendevkit/agents/manifest.json")
+        agent_profile = read(".github/agents/odk.agent.md")
+        skill = read(".github/skills/odk-readiness-check/SKILL.md")
+
+        self.assertIn("/odk-readiness-check", readiness)
+        self.assertIn('"commands": ["odk-readiness-check"]', catalog)
+        self.assertIn('"name": "odk-readiness-check"', catalog)
+        self.assertIn("skills: ['odk-readiness-check']", agent_profile)
+        self.assertIn("name: odk-readiness-check", skill)
+        for text in (readiness, catalog, agent_profile, skill):
+            self.assertNotIn("odk-readiness-refactor", text)
+
     def test_entry_points_preserve_shared_boundaries(self):
         for path in (
             ".opendevkit/agents/readiness.md",
             ".opendevkit/agents/orchestrator.md",
-            ".github/skills/odk-readiness-refactor/SKILL.md",
+            ".github/skills/odk-readiness-check/SKILL.md",
         ):
             with self.subTest(path=path):
                 text = read(path)
@@ -63,7 +77,7 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
             ".opendevkit/workflows/readiness-refactor.md",
             ".opendevkit/agents/readiness.md",
             ".opendevkit/agents/orchestrator.md",
-            ".github/skills/odk-readiness-refactor/SKILL.md",
+            ".github/skills/odk-readiness-check/SKILL.md",
         ):
             with self.subTest(path=path):
                 text = read(path)
@@ -133,7 +147,7 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
         for path in (
             ".opendevkit/agents/readiness.md",
             ".opendevkit/agents/orchestrator.md",
-            ".github/skills/odk-readiness-refactor/SKILL.md",
+            ".github/skills/odk-readiness-check/SKILL.md",
         ):
             with self.subTest(path=path):
                 text = read(path)
@@ -194,7 +208,7 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
         for path in (
             ".opendevkit/agents/readiness.md",
             ".opendevkit/agents/orchestrator.md",
-            ".github/skills/odk-readiness-refactor/SKILL.md",
+            ".github/skills/odk-readiness-check/SKILL.md",
         ):
             with self.subTest(path=path):
                 text = read(path)

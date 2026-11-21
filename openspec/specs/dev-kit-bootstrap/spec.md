@@ -7,18 +7,18 @@ This capability lets a user bootstrap selected AI development kit modules into a
 ## Requirements
 
 ### Requirement: User selects optional kit modules during bootstrap
-The GitHub-hosted install guidance SHALL install the core orchestrator, Readiness specialist, and Implementation specialist without asking about optional modules. After core installation, `/odk-readiness-refactor` SHALL ask which optional modules to enable and SHALL enable only those selected after the user approves the proposed changes. It SHALL NOT seed module data.
+The GitHub-hosted install guidance SHALL install the core orchestrator, Readiness specialist, and Implementation specialist without asking about optional modules. After core installation, `/odk-readiness-check` SHALL ask which optional modules to enable and SHALL enable only those selected after the user approves the proposed changes. It SHALL NOT seed module data.
 
 #### Scenario: User selects optional modules
-- **WHEN** the user selects one or more optional modules during `/odk-readiness-refactor`
+- **WHEN** the user selects one or more optional modules during `/odk-readiness-check`
 - **THEN** only the selected optional modules are enabled in addition to the core kit
 
 #### Scenario: User selects no modules
-- **WHEN** the user selects no optional modules during `/odk-readiness-refactor`
+- **WHEN** the user selects no optional modules during `/odk-readiness-check`
 - **THEN** no optional modules are enabled and the core orchestrator, Readiness specialist, and Implementation specialist remain installed
 
 #### Scenario: Wiki is selected
-- **WHEN** the user selects the Wiki module during `/odk-readiness-refactor`
+- **WHEN** the user selects the Wiki module during `/odk-readiness-check`
 - **THEN** the approved setup enables its commands without creating or seeding Wiki content
 
 ### Requirement: Readiness is a core specialist
@@ -26,7 +26,7 @@ The kit SHALL include the internal Readiness specialist with the orchestrator in
 
 #### Scenario: Installation omits optional modules
 - **WHEN** bootstrap completes with no optional modules selected
-- **THEN** the user can still invoke the readiness-refactor workflow through the orchestrator
+- **THEN** the user can still invoke the readiness-check workflow through the orchestrator
 
 ### Requirement: Implementation is a core specialist
 The kit SHALL include an internal Implementation specialist in every installation to carry out approved software-change tasks.
@@ -123,11 +123,11 @@ The bootstrap SHALL install a user-selectable VS Code Copilot agent facade for t
 The Readiness workflow SHALL check the workspace's default permissions before offering to set new chat sessions to Allow all, shall offer the setting only when it is not already enabled, and SHALL NOT change user-wide settings. The core installation workflow SHALL NOT offer or change this setting.
 
 #### Scenario: User opts in to workspace Allow all
-- **WHEN** the user explicitly accepts the Allow all option during `/odk-readiness-refactor`
+- **WHEN** the user explicitly accepts the Allow all option during `/odk-readiness-check`
 - **THEN** the workspace default for new chat sessions is set to Allow all and the user is told it applies to all agents in that workspace
 
 #### Scenario: User declines workspace Allow all
-- **WHEN** the user declines the Allow all option during `/odk-readiness-refactor`
+- **WHEN** the user declines the Allow all option during `/odk-readiness-check`
 - **THEN** the workspace permission setting remains unchanged
 
 #### Scenario: Workspace Allow all is already enabled
@@ -165,7 +165,7 @@ For an enabled module request, the orchestrator SHALL delegate domain-specific w
 - **THEN** the orchestrator does not pass that context to the specialized agent by default
 
 #### Scenario: Readiness request is routed
-- **WHEN** a user invokes `/odk-readiness-refactor`
+- **WHEN** a user invokes `/odk-readiness-check`
 - **THEN** the orchestrator delegates project-readiness assessment to the core Readiness specialist
 
 ### Requirement: The orchestrator fans out meaningful independent work

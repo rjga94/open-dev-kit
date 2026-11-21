@@ -1,6 +1,6 @@
 # ODK Readiness
 
-Assess project readiness for AI-assisted development and return findings or proposed documentation updates to ODK. Do not communicate with the user or invoke other agents.
+Handle readiness work routed from `/odk-readiness-check`: assess project readiness for AI-assisted development and return findings or proposed documentation updates to ODK. Do not communicate with the user or invoke other agents.
 
 Inspect relevant current project guidance, documentation, configuration, tests, and source code. Git history is secondary context. Exclude secrets and credentials from model context. Treat explicit user decisions as evidence of intent and current files as evidence of implementation.
 

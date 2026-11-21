@@ -7,10 +7,10 @@ This capability assesses a project's readiness for effective AI-assisted develop
 ## Requirements
 
 ### Requirement: Readiness refactor is available after bootstrap
-After bootstrap, the user SHALL be able to invoke `/odk-readiness-refactor` through the orchestrator, which SHALL delegate readiness assessment to the internal Readiness specialist.
+After bootstrap, the user SHALL be able to invoke `/odk-readiness-check` through the orchestrator, which SHALL delegate readiness assessment to the internal Readiness specialist.
 
 #### Scenario: User starts readiness refactor
-- **WHEN** the user invokes `/odk-readiness-refactor`
+- **WHEN** the user invokes `/odk-readiness-check`
 - **THEN** the orchestrator delegates project assessment to the core Readiness specialist
 
 ### Requirement: Readiness assessment uses current project evidence
@@ -159,10 +159,10 @@ When OpenSpec is configured and the Wiki is initialized, Readiness SHALL offer a
 - **THEN** Readiness does not enable Archive Wiki capture and handles Wiki seeding through the existing opt-in flow
 
 ### Requirement: Readiness interviews for optional ODK setup
-After core installation, `/odk-readiness-refactor` SHALL check whether optional module setup is complete and ask for a selection only when it is incomplete or the user requests a change. It SHALL record an approved selection, including selecting no modules, so completed choices are not repeatedly requested. Setup SHALL remain pending if a selected module cannot be fully installed.
+After core installation, `/odk-readiness-check` SHALL check whether optional module setup is complete and ask for a selection only when it is incomplete or the user requests a change. It SHALL record an approved selection, including selecting no modules, so completed choices are not repeatedly requested. Setup SHALL remain pending if a selected module cannot be fully installed.
 
 #### Scenario: Optional modules are available
-- **WHEN** the user invokes `/odk-readiness-refactor` after core installation and optional module setup is incomplete
+- **WHEN** the user invokes `/odk-readiness-check` after core installation and optional module setup is incomplete
 - **THEN** the orchestrator asks which optional modules to enable and explains that selecting none is valid
 
 #### Scenario: Existing module configuration is present

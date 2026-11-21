@@ -1,5 +1,5 @@
 ---
-name: odk-readiness-refactor
+name: odk-readiness-check
 description: Assess project readiness and prepare approved AI-guidance and documentation updates
 ---
 

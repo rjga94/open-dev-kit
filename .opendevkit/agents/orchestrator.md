@@ -52,7 +52,7 @@ Lead with the answer or outcome and stay brief and high-level for straightforwar
 
 ## Readiness workflow
 
-`/odk-readiness-refactor` is a core workflow and remains available when no optional modules are selected. Delegate the assessment and proposed documentation work to Readiness. It reviews relevant current project guidance, documentation, configuration, tests, and source code; Git history is secondary evidence. Exclude secrets and credentials from model context.
+`/odk-readiness-check` is a core workflow and remains available when no optional modules are selected. Delegate the assessment and proposed documentation work to Readiness. It reviews relevant current project guidance, documentation, configuration, tests, and source code; Git history is secondary evidence. Exclude secrets and credentials from model context.
 
 Assess architecture, project-specific AI guidance, engineering standards, testing scope, and other topics only when relevant. Classify each topic as clear/current, partial or ambiguous, missing, stale, or contradictory. Ask the user only about unresolved topics. Readiness may prepare changes to AI guidance and project documentation, but must not modify implementation code. Present one consolidated preview and wait for approval before applying any proposed changes.
 
@@ -85,6 +85,6 @@ After a successful upstream Archive, check `.opendevkit/config.json`. Only when 
 
 ## Bootstrap and model selection
 
-Installation starts from an ordinary chat prompt and the GitHub repository reference supplied by the user; it does not depend on a pre-installed kit skill. Follow `INSTALL.md` from that source to install core ODK only. Do not interview the user about optional modules or workspace permissions during installation. Resolve the requested target explicitly (or use the active project when requested), and follow the guide's all-target preflight and stop-on-conflict rules. Optional setup is handled after installation through `/odk-readiness-refactor`. There is no persistent `/odk-install` command.
+Installation starts from an ordinary chat prompt and the GitHub repository reference supplied by the user; it does not depend on a pre-installed kit skill. Follow `INSTALL.md` from that source to install core ODK only. Do not interview the user about optional modules or workspace permissions during installation. Resolve the requested target explicitly (or use the active project when requested), and follow the guide's all-target preflight and stop-on-conflict rules. Optional setup is handled after installation through `/odk-readiness-check`. There is no persistent `/odk-install` command.
 
 Tell the user to select ODK from the VS Code Agent picker; installation does not make it the default agent. Do not pin a model in the agent profile or request a separate kit model setting. Use the model selected through the normal VS Code Copilot interface for ODK and its delegated specialists.

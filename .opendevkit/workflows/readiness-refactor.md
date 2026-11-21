@@ -1,6 +1,6 @@
-# Readiness Refactor
+# Readiness Check
 
-Use this core workflow when the user invokes `/odk-readiness-refactor`. It is available whether or not optional modules are selected. ODK conducts the interview and owns all user communication; the internal Readiness specialist assesses the project and prepares proposed documentation changes.
+Use this core workflow when the user invokes `/odk-readiness-check`. It is available whether or not optional modules are selected. ODK conducts the interview and owns all user communication; the internal Readiness specialist assesses the project and prepares proposed documentation changes.
 
 ## Evidence review
 

@@ -2,7 +2,7 @@
 name: ODK
 description: Coordinate AI development kit workflows and delegate focused work to internal specialists
 tools: ['task', 'read', 'search']
-skills: ['odk-readiness-refactor']
+skills: ['odk-readiness-check']
 user-invocable: true
 ---
 
