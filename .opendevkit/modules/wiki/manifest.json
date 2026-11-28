@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wiki",
+  "readinessWorkflow": "workflow-readiness",
   "files": [
     {
       "id": "specialist",
@@ -12,6 +13,12 @@
       "id": "workflow-module",
       "source": ".opendevkit/modules/wiki/core/workflows/wiki-module.md",
       "installAs": ".opendevkit/modules/wiki/core/workflows/wiki-module.md",
+      "host": "core"
+    },
+    {
+      "id": "workflow-readiness",
+      "source": ".opendevkit/modules/wiki/core/workflows/wiki-readiness.md",
+      "installAs": ".opendevkit/modules/wiki/core/workflows/wiki-readiness.md",
       "host": "core"
     },
     {

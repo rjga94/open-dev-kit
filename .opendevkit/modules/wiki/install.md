@@ -29,3 +29,9 @@ through Readiness and follows the seed workflow's screening requirements.
 Repair or refresh of existing Wiki data is a separate operation requiring its
 own explicit authorization. Wiki data operations may write only inside
 `.opendevkit/wiki/`; module installation consent alone never authorizes them.
+
+After successful enablement, the manifest-declared
+`core/workflows/wiki-readiness.md` workflow owns Wiki health checks and
+readiness-specific choices. Its read-only integrity check does not imply
+permission to scan, repair, seed, or write; each operation retains its own
+explicit choice and proposed-change approval.

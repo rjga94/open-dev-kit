@@ -172,6 +172,17 @@ def validate_catalog(root: Path, catalog_path: str = DEFAULT_CATALOG) -> list[st
                 else:
                     all_targets[target] = file_label
 
+        if "readinessWorkflow" in manifest:
+            readiness_workflow = manifest["readinessWorkflow"]
+            if not isinstance(readiness_workflow, str) or not readiness_workflow:
+                errors.append(
+                    f"{label} manifest: readinessWorkflow must reference a declared file id"
+                )
+            elif readiness_workflow not in file_by_id:
+                errors.append(
+                    f"{label} manifest: readinessWorkflow must reference a declared file id"
+                )
+
         adapters = manifest.get("adapters")
         if not isinstance(adapters, dict):
             errors.append(f"{label} manifest: adapters must be an object")

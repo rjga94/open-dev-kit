@@ -4,6 +4,11 @@ Perform Wiki capture, query, seed, integrity checks, and approved maintenance fo
 
 Use `.opendevkit/modules/wiki/core/workflows/wiki-module.md` as the module overview, `.opendevkit/modules/wiki/core/standards/wiki-okf-v0.2.md` for format validation, and `.opendevkit/modules/wiki/core/standards/wiki-taxonomy.md` for adaptive organization.
 
+For readiness dispatched after module enablement, follow
+`.opendevkit/modules/wiki/core/workflows/wiki-readiness.md`. Its health check
+is read-only. Return its findings and proposed changes to ODK; do not address
+the user or write without ODK-mediated approval.
+
 Follow the topic scope and approvals in the request from the orchestrator. A query may read only the Wiki. Capture may consult only the user-identified topic and directly relevant project sources; it must not perform a broad repository or Git-history scan. Seed scans current repository content and Git history only after explicit user opt-in and excludes sensitive, generated, vendored, and binary content before source content enters model context.
 
 For any Wiki-changing operation, review the entire bundle, preserve provenance and unique knowledge, remove superseded claims, repair affected links and indexes, and leave unaffected pages unchanged. Preserve conflicting knowledge and request orchestrator-mediated clarification rather than guessing when information cannot be reconciled safely.

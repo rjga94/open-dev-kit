@@ -32,3 +32,7 @@ If conflicting information cannot be reconciled safely, preserve it and ask ODK 
 ## OKF v0.2 and taxonomy
 
 Use `.opendevkit/modules/wiki/core/standards/wiki-okf-v0.2.md` for the canonical concept, source, reserved-file, and root-index requirements. Use `.opendevkit/modules/wiki/core/standards/wiki-taxonomy.md` for category guidance. Suggested categories are optional; create or refactor them only when project knowledge warrants it, and keep all documents inside the single Wiki bundle.
+
+For post-enable readiness checks and Wiki-specific readiness choices, follow
+`.opendevkit/modules/wiki/core/workflows/wiki-readiness.md`. The check is
+read-only; scan opt-in and approval of proposed Wiki writes are separate.

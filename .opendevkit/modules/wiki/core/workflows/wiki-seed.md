@@ -2,6 +2,12 @@
 
 Run this workflow only when the user explicitly invokes `/odk-wiki-seed` or explicitly opts in through Readiness. It scans the current repository and Git history to create or refresh `.opendevkit/wiki/`. One Wiki specialist owns the complete operation and writes only inside that bundle.
 
+For a Readiness-initiated seed or reseed, the opt-in authorizes screening,
+scanning, and preparation of a complete proposed file-change preview only.
+Do not create or modify Wiki files until ODK presents that preview and obtains
+separate explicit approval. After approval, apply only the approved changes.
+Direct `/odk-wiki-seed` invocation retains its existing authorization behavior.
+
 ## Pre-context source screening
 
 Do not open candidate source content in model context until it has passed these local-only screening steps. Screening commands must return file paths or counts only, never matched lines or secret values.

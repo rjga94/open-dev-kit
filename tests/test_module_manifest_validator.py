@@ -68,6 +68,24 @@ class ModuleManifestValidatorTests(unittest.TestCase):
     def errors(self):
         return validate_catalog(self.root)
 
+    def test_valid_readiness_workflow_reference(self):
+        self.module["files"].append(
+            {"id": "readiness-workflow", "source": "source.md",
+             "installAs": ".opendevkit/wiki/readiness.md", "host": "core"}
+        )
+        self.module["readinessWorkflow"] = "readiness-workflow"
+        self.write_fixtures()
+        self.assertEqual(self.errors(), [])
+
+    def test_missing_readiness_workflow_reference_fails(self):
+        self.module["readinessWorkflow"] = "missing-workflow"
+        self.write_fixtures()
+        self.assertTrue(any("readinessWorkflow" in error for error in self.errors()))
+
+    def test_absent_readiness_workflow_reference_is_valid(self):
+        self.assertNotIn("readinessWorkflow", self.module)
+        self.assertEqual(self.errors(), [])
+
     def test_missing_catalog_manifest_reference_fails(self):
         self.catalog["optionalModules"]["wiki"]["manifest"] = (
             ".opendevkit/modules/missing/manifest.json"

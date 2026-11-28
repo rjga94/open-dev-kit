@@ -19,8 +19,8 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
         wiki = catalog["optionalModules"]["wiki"]
         self.assertTrue((ROOT / wiki["manifest"]).is_file())
         self.assertTrue((ROOT / wiki["installGuide"]).is_file())
-        self.assertIn("load only each selected module's", workflow)
-        self.assertIn("do not load unselected modules' manifests or guides as setup inputs", workflow)
+        self.assertIn("immediately load only that selected module's", workflow)
+        self.assertIn("Do not load unselected modules' manifests or guides as setup inputs", workflow)
         self.assertIn("For an empty selection load none as setup inputs", workflow)
         self.assertIn("An empty selection still has a configuration plan", workflow)
         self.assertIn("`installAs` destinations", workflow)
@@ -30,10 +30,18 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
         self.assertIn("only unanswered module-specific decisions", workflow)
         self.assertIn("already answered by the user or established in project configuration", workflow)
         self.assertIn("do not infer an ambiguous answer", workflow)
-        self.assertIn("without an extra module-specific interview", workflow)
+        self.assertIn("without an extra interview", workflow)
+        self.assertIn("Would you like to enable the `<module>` module?", workflow)
+        self.assertIn("with “Yes” and “No” choices", workflow)
+        self.assertIn("immediately load only that selected module's", workflow)
+        self.assertIn("before presenting the next module or preparing the plan", workflow)
         self.assertIn("one consolidated exact plan", workflow)
         self.assertIn("module-specific answers and their effects", workflow)
         self.assertIn("configuration changes", workflow)
+        self.assertLess(
+            workflow.index("immediately load only that selected module's"),
+            workflow.index("before presenting the next module or preparing the plan"),
+        )
         self.assertLess(workflow.index("ODK asks those targeted questions"),
                         workflow.index("one consolidated exact plan"))
         guide = read(".opendevkit/modules/wiki/install.md")
@@ -54,7 +62,7 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
         for text in (readiness, catalog, agent_profile, skill):
             self.assertNotIn("odk-readiness-refactor", text)
 
-    def test_entry_points_preserve_shared_boundaries(self):
+    def test_entry_points_preserve_generic_module_safety_boundaries(self):
         for path in (
             ".opendevkit/agents/readiness.md",
             ".opendevkit/agents/orchestrator.md",
@@ -69,8 +77,125 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
                 self.assertIn("consolidated exact plan", text)
                 self.assertIn("conflict", text)
                 self.assertIn("approval", text)
-                self.assertIn("seed", text)
-                self.assertIn("repair", text)
+                self.assertIn("data operation", text)
+
+    def test_core_readiness_declares_bounded_builtin_prompts(self):
+        workflow = read(".opendevkit/workflows/readiness-refactor.md")
+        prompts = (
+            ("Would you like to enable the `<module>` module?", "“Yes” and “No” choices"),
+            ("Enable Allow All approvals for this workspace?", "“Enable” and “Leave unchanged” choices"),
+            ("Would you like me to prepare a project-scoped OpenSpec setup plan for this workspace?",
+             "“Yes” / “No”"),
+            ("Do you approve this exact setup plan?", "“Approve” / “Decline”"),
+            ("Replace the existing file at `<path>` with the proposed content?",
+             "“Replace” / “Keep existing”"),
+            ("Do you approve the proposed documentation changes?",
+             "“Approve all” / “Approve selected files” / “Decline”"),
+        )
+        for prompt, choices in prompts:
+            with self.subTest(prompt=prompt):
+                self.assertIn(prompt, workflow)
+                self.assertIn(choices, workflow)
+        for requirement in (
+            "one focused question",
+            "concise, closed answer choices",
+            "grounded in the specialist's evidence",
+            "Do not require a free-form explanation",
+            "topic already established by evidence or prior user input",
+            "distinct decisions",
+            "never treat a clarification answer or one approval as another",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, workflow)
+
+    def test_generic_readiness_dispatch_is_enabled_only_and_after_success(self):
+        workflow = read(".opendevkit/workflows/readiness-refactor.md")
+        dispatch = workflow.split("## Enabled-module readiness dispatch", 1)[1]
+        for requirement in (
+            "`readinessWorkflow` file ID",
+            "resolve that ID to its declared file",
+            "only modules recorded as enabled",
+            "after every planned target has been successfully installed and verified and the module is enabled",
+            "already-enabled modules",
+            "declined, unselected, skipped, or incompletely installed modules",
+            "without the optional declaration",
+            "do not communicate with the user directly or authorize writes",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, dispatch)
+
+        self.assertNotIn("Wiki", workflow)
+        self.assertNotIn("postArchiveWikiCapture", workflow)
+        self.assertNotIn(".opendevkit/wiki/", workflow)
+
+        for path in (
+            ".opendevkit/agents/readiness.md",
+            ".opendevkit/agents/orchestrator.md",
+            ".github/skills/odk-readiness-check/SKILL.md",
+        ):
+            with self.subTest(path=path):
+                text = read(path)
+                self.assertIn("readinessWorkflow", text)
+                self.assertIn("already-enabled modules", text)
+                self.assertIn("incompletely installed", text)
+
+    def test_wiki_readiness_is_manifest_declared_and_module_owned(self):
+        manifest = json.loads(read(".opendevkit/modules/wiki/manifest.json"))
+        declared_id = manifest["readinessWorkflow"]
+        declared_file = next(
+            item for item in manifest["files"] if item["id"] == declared_id
+        )
+        self.assertEqual(declared_file["source"],
+                         ".opendevkit/modules/wiki/core/workflows/wiki-readiness.md")
+        self.assertEqual(declared_file["installAs"],
+                         ".opendevkit/modules/wiki/core/workflows/wiki-readiness.md")
+        self.assertEqual(declared_file["host"], "core")
+
+        readiness = " ".join(read(declared_file["source"]).split())
+        for requirement in (
+            "only when the Wiki module is enabled",
+            "without changing files",
+            "canonical OKF",
+            "source provenance",
+            "references",
+            "index",
+            "taxonomy",
+            "consistency",
+            "Would you like to seed a Wiki by scanning this repository and its Git history?",
+            "How should I handle the Wiki issues?",
+            "Reseed from repository/history",
+            "separate explicit approval",
+            "Do you approve these proposed Wiki changes?",
+            "before any Wiki write",
+            "broad repository or Git-history scan",
+            "preferences.postArchiveWikiCapture",
+            'exactly `"not-offered"`',
+            "Enable automatic Wiki capture after OpenSpec Archive?",
+            "only after a successful OpenSpec Archive",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, readiness)
+
+        for path in (
+            ".opendevkit/modules/wiki/core/specialist.md",
+            ".opendevkit/modules/wiki/core/workflows/wiki-module.md",
+            ".opendevkit/modules/wiki/install.md",
+        ):
+            with self.subTest(path=path):
+                self.assertIn("wiki-readiness.md", read(path))
+
+        seed = " ".join(read(".opendevkit/modules/wiki/core/workflows/wiki-seed.md").split())
+        self.assertIn("Do not create or modify Wiki files until ODK presents that preview", seed)
+        self.assertIn("Direct `/odk-wiki-seed` invocation retains its existing authorization behavior", seed)
+
+    def test_core_readiness_entrypoints_have_no_wiki_specific_branches(self):
+        for path in (
+            ".opendevkit/workflows/readiness-refactor.md",
+            ".opendevkit/agents/readiness.md",
+            ".github/skills/odk-readiness-check/SKILL.md",
+        ):
+            with self.subTest(path=path):
+                self.assertNotIn("Wiki", read(path))
 
     def test_recorded_provenance_never_falls_back_on_retrieval_failure(self):
         for path in (
@@ -201,7 +326,7 @@ class ReadinessModuleGuidanceTests(unittest.TestCase):
             "exactly which files changed, which failed or were not attempted",
             "actual configuration/provenance state",
             "never use a success-shaped fallback",
-            "Wiki data",
+            "module data operation",
         ):
             with self.subTest(requirement=requirement):
                 self.assertIn(requirement, workflow)
